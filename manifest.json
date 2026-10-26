@@ -1,0 +1,13 @@
+{
+    "display_name": "独立聊天记录查看器",
+    "loading_order": 900,
+    "requires": [],
+    "optional": [],
+    "js": "index.js",
+    "css": "style.css",
+    "author": "Manus",
+    "version": "1.0.0",
+    "homePage": "https://github.com/w1516970/sillytavern-chat-viewer",
+    "auto_update": true,
+    "minimum_client_version": "1.0.0"
+}
