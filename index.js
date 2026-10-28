@@ -9,7 +9,9 @@ let outline;
 let range;
 let percentInput;
 let status;
+let htmlToggle;
 let lastChatSignature = '';
+let htmlEnabled = localStorage.getItem(`${EXTENSION_ID}:html-enabled`) === 'true';
 
 function escapeText(value) {
     return value == null ? '' : String(value);
@@ -28,6 +30,28 @@ function getSpeaker(message) {
 
 function getMessageText(message) {
     return escapeText(message.mes ?? message.message ?? '').trim();
+}
+
+function sanitizeHtml(value) {
+    const html = escapeText(value);
+    const purifier = SillyTavern.libs?.DOMPurify;
+    if (purifier) {
+        return purifier.sanitize(html, {
+            USE_PROFILES: { html: true },
+            ADD_ATTR: ['target', 'rel'],
+            FORBID_TAGS: ['style', 'script', 'iframe', 'object', 'embed', 'form'],
+        });
+    }
+
+    const template = document.createElement('template');
+    template.innerHTML = html;
+    template.content.querySelectorAll('script,style,iframe,object,embed,form,link,meta').forEach(node => node.remove());
+    template.content.querySelectorAll('*').forEach(node => {
+        [...node.attributes].forEach(attribute => {
+            if (attribute.name.toLowerCase().startsWith('on')) node.removeAttribute(attribute.name);
+        });
+    });
+    return template.innerHTML;
 }
 
 function createButton(parent, label, icon, handler, extraClass = '') {
@@ -102,6 +126,10 @@ function buildModal() {
                 <input class="st-chat-viewer-range" type="range" min="0" max="100" value="0" step="0.1" aria-label="聊天记录进度">
                 <input class="st-chat-viewer-percent" type="number" min="0" max="100" step="0.1" value="0" aria-label="聊天记录百分比">
                 <span>%</span>
+                <label class="st-chat-viewer-html-toggle" title="开启后在查看器内渲染消息中的安全 HTML">
+                    <input type="checkbox" aria-label="HTML 渲染" ${htmlEnabled ? 'checked' : ''}>
+                    <span>HTML 渲染</span>
+                </label>
             </div>
             <div class="st-chat-viewer-body">
                 <aside class="st-chat-viewer-outline" aria-label="楼层目录"></aside>
@@ -114,6 +142,7 @@ function buildModal() {
     range = modal.querySelector('.st-chat-viewer-range');
     percentInput = modal.querySelector('.st-chat-viewer-percent');
     status = modal.querySelector('.st-chat-viewer-status');
+    htmlToggle = modal.querySelector('.st-chat-viewer-html-toggle input');
 
     modal.querySelector('.st-chat-viewer-backdrop').addEventListener('click', closeViewer);
     modal.querySelector('.st-chat-viewer-close').addEventListener('click', closeViewer);
@@ -122,6 +151,11 @@ function buildModal() {
     percentInput.addEventListener('change', () => {
         const value = Math.max(0, Math.min(100, Number(percentInput.value) || 0));
         scrollToPercent(value);
+    });
+    htmlToggle.addEventListener('change', () => {
+        htmlEnabled = htmlToggle.checked;
+        localStorage.setItem(`${EXTENSION_ID}:html-enabled`, String(htmlEnabled));
+        renderViewer();
     });
     list.addEventListener('scroll', updateProgressFromScroll, { passive: true });
     document.addEventListener('keydown', event => {
@@ -164,7 +198,12 @@ function renderViewer() {
         head.append(speaker, floorLabel, date);
         const content = document.createElement('div');
         content.className = 'st-chat-viewer-message-content';
-        content.textContent = text || '（空消息）';
+        if (htmlEnabled && text) {
+            content.classList.add('is-html');
+            content.innerHTML = sanitizeHtml(text);
+        } else {
+            content.textContent = text || '（空消息）';
+        }
         card.append(head, content);
         list.appendChild(card);
 
