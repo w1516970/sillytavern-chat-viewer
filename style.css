@@ -1,8 +1,23 @@
-#st_chat_viewer_wand_container .menu_button,
-#st_chat_viewer_wand_container .menu_button span {
-    display: inline-flex;
+#st_chat_viewer_wand_container .menu_button {
+    display: flex !important;
+    flex-direction: row !important;
     align-items: center;
+    justify-content: flex-start;
     gap: 6px;
+    width: 100%;
+    min-width: 180px;
+    box-sizing: border-box;
+    white-space: nowrap;
+    writing-mode: horizontal-tb;
+    text-orientation: mixed;
+}
+
+#st_chat_viewer_wand_container .menu_button > i,
+#st_chat_viewer_wand_container .menu_button > span {
+    display: inline-flex !important;
+    flex: 0 0 auto;
+    writing-mode: horizontal-tb;
+    white-space: nowrap;
 }
 
 .st-chat-viewer-modal {
