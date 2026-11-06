@@ -1,4 +1,4 @@
-/* 魔法棒入口：不受酒馆布局影响，始终保持横向 */
+/* 魔法棒入口：不受酒馆布局影响，始终保持横向；颜色跟随查看器主题 */
 #st_chat_viewer_wand_container .menu_button {
     display: flex !important;
     flex-direction: row !important;
@@ -21,14 +21,225 @@
     white-space: nowrap;
 }
 
-/* 独立主题：使用固定设计令牌，不读取酒馆主题变量 */
+#st_chat_viewer_wand_container .st_chat_viewer_open_button {
+    border: 1px solid color-mix(in srgb, var(--viewer-wand-color, #7c9cff) 45%, transparent) !important;
+    border-radius: 10px;
+    transition: .2s ease;
+}
+#st_chat_viewer_wand_container .st_chat_viewer_open_button i { color: var(--viewer-wand-color, #7c9cff) !important; }
+#st_chat_viewer_wand_container .st_chat_viewer_open_button:hover {
+    background: color-mix(in srgb, var(--viewer-wand-color, #7c9cff) 16%, transparent) !important;
+    box-shadow: 0 0 10px color-mix(in srgb, var(--viewer-wand-color, #7c9cff) 32%, transparent);
+}
+
+/* ============ 独立主题基座：默认「深空蓝」，全部组件走变量 ============ */
+#st_chat_viewer_modal {
+    --viewer-font: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    --viewer-window-bg: linear-gradient(145deg, #111b32 0%, #0c1325 100%);
+    --viewer-window-border: rgba(151, 178, 235, .24);
+    --viewer-backdrop: rgba(3, 6, 18, .78);
+    --viewer-radius: 22px;
+    --viewer-header-bg: linear-gradient(110deg, rgba(39, 61, 111, .66), rgba(21, 31, 62, .46));
+    --viewer-bar-bg: rgba(7, 13, 29, .48);
+    --viewer-outline-bg: rgba(6, 12, 28, .38);
+    --viewer-line: rgba(164, 186, 226, .16);
+    --viewer-text: #edf3ff;
+    --viewer-muted: #8f9fbb;
+    --viewer-accent: #7c9cff;
+    --viewer-accent-2: #64d9ff;
+    --viewer-accent-3: #a78bfa;
+    --viewer-ok: #5ee7ad;
+    --viewer-card: rgba(20, 31, 55, .86);
+    --viewer-card-user: rgba(20, 31, 55, .86);
+    --viewer-card-border: rgba(160, 183, 232, .14);
+    --viewer-user-accent: #64d9ff;
+    --viewer-char-accent: #a78bfa;
+    --viewer-btn-bg: rgba(255, 255, 255, .07);
+    --viewer-btn-bg-hover: rgba(124, 156, 255, .28);
+    --viewer-btn-text: #dce8ff;
+    --viewer-input-bg: rgba(255, 255, 255, .07);
+    --viewer-code-bg: #080d1b;
+    --viewer-code-text: #d9c8ff;
+    --viewer-quote-bg: rgba(167, 139, 250, .08);
+    --viewer-quote-text: #aebed8;
+    --viewer-switch-off-bg: #2b3852;
+    --viewer-switch-knob: #9aaaca;
+    --viewer-switch-knob-on: #effff8;
+    --viewer-list-glow: radial-gradient(circle at 85% 0%, rgba(83, 117, 218, .13), transparent 35%);
+    --viewer-shadow: 0 24px 80px rgba(0, 0, 0, .46);
+    --viewer-wand-color: #7c9cff;
+}
+
+/* ---------- 主题：跟随当前酒馆美化 ---------- */
+#st_chat_viewer_modal.theme-tavern {
+    --viewer-font: var(--SmartThemeFont, inherit);
+    --viewer-window-bg: var(--SmartThemeBlurTintColor, #1a1a2e);
+    --viewer-window-border: var(--SmartThemeBorderColor, #666);
+    --viewer-backdrop: rgba(0, 0, 0, .7);
+    --viewer-radius: 10px;
+    --viewer-header-bg: color-mix(in srgb, var(--SmartThemeChatTintColor, transparent) 55%, transparent);
+    --viewer-bar-bg: color-mix(in srgb, var(--SmartThemeChatTintColor, transparent) 35%, transparent);
+    --viewer-outline-bg: color-mix(in srgb, var(--SmartThemeChatTintColor, transparent) 25%, transparent);
+    --viewer-line: var(--SmartThemeBorderColor, #666);
+    --viewer-text: var(--SmartThemeBodyColor, #ddd);
+    --viewer-muted: color-mix(in srgb, var(--SmartThemeBodyColor, #ddd) 62%, transparent);
+    --viewer-accent: var(--SmartThemeQuoteColor, #a78bfa);
+    --viewer-accent-2: var(--SmartThemeCheckboxColor, #64d9ff);
+    --viewer-accent-3: var(--SmartThemeEmColor, #a78bfa);
+    --viewer-card: var(--SmartThemeBotMesBlurTintColor, rgba(0, 0, 0, .3));
+    --viewer-card-user: var(--SmartThemeUserMesBlurTintColor, rgba(0, 0, 0, .3));
+    --viewer-card-border: var(--SmartThemeBorderColor, #666);
+    --viewer-user-accent: var(--SmartThemeCheckboxColor, #64d9ff);
+    --viewer-char-accent: var(--SmartThemeQuoteColor, #a78bfa);
+    --viewer-btn-bg: color-mix(in srgb, var(--SmartThemeBorderColor, #666) 35%, transparent);
+    --viewer-btn-bg-hover: color-mix(in srgb, var(--SmartThemeQuoteColor, #a78bfa) 30%, transparent);
+    --viewer-btn-text: var(--SmartThemeBodyColor, #ddd);
+    --viewer-input-bg: color-mix(in srgb, var(--SmartThemeBorderColor, #666) 30%, transparent);
+    --viewer-code-bg: color-mix(in srgb, var(--SmartThemeBorderColor, #666) 25%, transparent);
+    --viewer-code-text: var(--SmartThemeEmColor, #d9c8ff);
+    --viewer-quote-bg: color-mix(in srgb, var(--SmartThemeQuoteColor, #a78bfa) 12%, transparent);
+    --viewer-quote-text: color-mix(in srgb, var(--SmartThemeBodyColor, #ddd) 80%, transparent);
+    --viewer-list-glow: none;
+    --viewer-shadow: var(--smartThemeShadowColor, 0 0 40px rgba(0, 0, 0, .5));
+    --viewer-wand-color: var(--SmartThemeQuoteColor, #a78bfa);
+}
+
+/* ---------- 主题：极光 ---------- */
+#st_chat_viewer_modal.theme-aurora {
+    --viewer-window-bg: linear-gradient(145deg, #07231c 0%, #04141a 100%);
+    --viewer-window-border: rgba(110, 230, 180, .22);
+    --viewer-backdrop: rgba(2, 14, 12, .8);
+    --viewer-header-bg: linear-gradient(110deg, rgba(15, 74, 58, .6), rgba(8, 42, 38, .45));
+    --viewer-bar-bg: rgba(4, 20, 17, .5);
+    --viewer-outline-bg: rgba(3, 17, 14, .4);
+    --viewer-line: rgba(120, 220, 180, .16);
+    --viewer-text: #eafff6;
+    --viewer-muted: #7fae9e;
+    --viewer-accent: #43e5a0;
+    --viewer-accent-2: #7df0ff;
+    --viewer-accent-3: #ffd166;
+    --viewer-card: rgba(10, 42, 34, .85);
+    --viewer-card-user: rgba(9, 36, 42, .85);
+    --viewer-card-border: rgba(120, 220, 180, .15);
+    --viewer-user-accent: #7df0ff;
+    --viewer-char-accent: #43e5a0;
+    --viewer-btn-bg-hover: rgba(67, 229, 160, .24);
+    --viewer-btn-text: #d2ffe9;
+    --viewer-code-bg: #03120e;
+    --viewer-code-text: #9ff0c8;
+    --viewer-quote-bg: rgba(67, 229, 160, .09);
+    --viewer-quote-text: #a9d8c4;
+    --viewer-list-glow: radial-gradient(circle at 85% 0%, rgba(67, 229, 160, .12), transparent 35%);
+    --viewer-wand-color: #43e5a0;
+}
+
+/* ---------- 主题：樱粉（浅色） ---------- */
+#st_chat_viewer_modal.theme-sakura {
+    --viewer-window-bg: linear-gradient(145deg, #fff5f8 0%, #fdeaf2 100%);
+    --viewer-window-border: rgba(224, 86, 140, .3);
+    --viewer-backdrop: rgba(84, 42, 62, .45);
+    --viewer-header-bg: linear-gradient(110deg, rgba(255, 214, 230, .8), rgba(255, 228, 238, .6));
+    --viewer-bar-bg: rgba(255, 240, 246, .65);
+    --viewer-outline-bg: rgba(255, 240, 246, .6);
+    --viewer-line: rgba(210, 120, 160, .3);
+    --viewer-text: #4a2c3a;
+    --viewer-muted: #a3798c;
+    --viewer-accent: #e0568c;
+    --viewer-accent-2: #d977ab;
+    --viewer-accent-3: #b58ee0;
+    --viewer-ok: #2fae83;
+    --viewer-card: rgba(255, 255, 255, .88);
+    --viewer-card-user: rgba(255, 240, 246, .92);
+    --viewer-card-border: rgba(224, 86, 140, .2);
+    --viewer-user-accent: #d977ab;
+    --viewer-char-accent: #e0568c;
+    --viewer-btn-bg: rgba(224, 86, 140, .1);
+    --viewer-btn-bg-hover: rgba(224, 86, 140, .24);
+    --viewer-btn-text: #4a2c3a;
+    --viewer-input-bg: rgba(255, 255, 255, .8);
+    --viewer-code-bg: #fbe4ee;
+    --viewer-code-text: #a03060;
+    --viewer-quote-bg: rgba(224, 86, 140, .08);
+    --viewer-quote-text: #8a5f70;
+    --viewer-switch-off-bg: #eccbd9;
+    --viewer-switch-knob: #ffffff;
+    --viewer-list-glow: radial-gradient(circle at 85% 0%, rgba(224, 86, 140, .1), transparent 35%);
+    --viewer-shadow: 0 24px 70px rgba(120, 40, 70, .3);
+    --viewer-wand-color: #e0568c;
+}
+
+/* ---------- 主题：落日 ---------- */
+#st_chat_viewer_modal.theme-sunset {
+    --viewer-window-bg: linear-gradient(150deg, #2b1530 0%, #40201a 55%, #1f1215 100%);
+    --viewer-window-border: rgba(255, 158, 100, .26);
+    --viewer-backdrop: rgba(20, 8, 10, .8);
+    --viewer-header-bg: linear-gradient(110deg, rgba(96, 44, 40, .6), rgba(64, 30, 34, .45));
+    --viewer-bar-bg: rgba(28, 14, 14, .5);
+    --viewer-outline-bg: rgba(26, 12, 12, .4);
+    --viewer-line: rgba(255, 160, 110, .18);
+    --viewer-text: #ffeede;
+    --viewer-muted: #c09a8a;
+    --viewer-accent: #ff9e64;
+    --viewer-accent-2: #ffce6b;
+    --viewer-accent-3: #f0648c;
+    --viewer-ok: #7ddf8e;
+    --viewer-card: rgba(66, 34, 32, .85);
+    --viewer-card-user: rgba(70, 38, 26, .85);
+    --viewer-card-border: rgba(255, 160, 110, .16);
+    --viewer-user-accent: #ffce6b;
+    --viewer-char-accent: #ff9e64;
+    --viewer-btn-bg-hover: rgba(255, 158, 100, .26);
+    --viewer-btn-text: #ffe3cc;
+    --viewer-code-bg: #1c0e0c;
+    --viewer-code-text: #ffc9a3;
+    --viewer-quote-bg: rgba(255, 158, 100, .09);
+    --viewer-quote-text: #d9b09a;
+    --viewer-list-glow: radial-gradient(circle at 85% 0%, rgba(255, 158, 100, .13), transparent 35%);
+    --viewer-wand-color: #ff9e64;
+}
+
+/* ---------- 主题：纸墨（浅色） ---------- */
+#st_chat_viewer_modal.theme-paper {
+    --viewer-window-bg: linear-gradient(145deg, #f6efdd 0%, #efe4cb 100%);
+    --viewer-window-border: rgba(138, 109, 59, .35);
+    --viewer-backdrop: rgba(60, 45, 25, .5);
+    --viewer-header-bg: linear-gradient(110deg, rgba(232, 219, 189, .9), rgba(238, 228, 203, .7));
+    --viewer-bar-bg: rgba(244, 236, 216, .7);
+    --viewer-outline-bg: rgba(240, 231, 208, .65);
+    --viewer-line: rgba(120, 100, 60, .28);
+    --viewer-text: #3a3226;
+    --viewer-muted: #8a7c62;
+    --viewer-accent: #8a6d3b;
+    --viewer-accent-2: #5a7d5a;
+    --viewer-accent-3: #a0522d;
+    --viewer-ok: #4a7d4a;
+    --viewer-card: rgba(255, 252, 244, .92);
+    --viewer-card-user: rgba(246, 239, 221, .95);
+    --viewer-card-border: rgba(138, 109, 59, .22);
+    --viewer-user-accent: #5a7d5a;
+    --viewer-char-accent: #a0522d;
+    --viewer-btn-bg: rgba(138, 109, 59, .1);
+    --viewer-btn-bg-hover: rgba(138, 109, 59, .22);
+    --viewer-btn-text: #3a3226;
+    --viewer-input-bg: rgba(255, 252, 244, .9);
+    --viewer-code-bg: #e8dcc0;
+    --viewer-code-text: #6b4f2a;
+    --viewer-quote-bg: rgba(160, 82, 45, .08);
+    --viewer-quote-text: #6e6250;
+    --viewer-switch-off-bg: #d9cbaa;
+    --viewer-switch-knob: #ffffff;
+    --viewer-list-glow: radial-gradient(circle at 85% 0%, rgba(138, 109, 59, .1), transparent 35%);
+    --viewer-shadow: 0 24px 70px rgba(80, 60, 30, .35);
+    --viewer-wand-color: #8a6d3b;
+}
+
 #st_chat_viewer_modal,
 #st_chat_viewer_modal * {
     box-sizing: border-box;
-    font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-family: var(--viewer-font);
 }
 
-/* 修复：上面的 font-family 覆盖会吞掉 Font Awesome 图标，导致按钮显示为方块 */
+/* 修复：font-family 继承会吞掉 Font Awesome 图标，导致按钮显示为方块 */
 #st_chat_viewer_modal i[class*="fa-"] {
     font-family: "Font Awesome 6 Free", "Font Awesome 6 Pro", "FontAwesome" !important;
     font-weight: 900 !important;
@@ -36,18 +247,6 @@
 }
 
 #st_chat_viewer_modal {
-    --viewer-bg: #0b1020;
-    --viewer-panel: #111a2e;
-    --viewer-panel-2: #16213a;
-    --viewer-card: rgba(20, 31, 55, .86);
-    --viewer-line: rgba(164, 186, 226, .16);
-    --viewer-text: #edf3ff;
-    --viewer-muted: #8f9fbb;
-    --viewer-blue: #7c9cff;
-    --viewer-cyan: #64d9ff;
-    --viewer-purple: #a78bfa;
-    --viewer-green: #5ee7ad;
-    --viewer-shadow: 0 24px 80px rgba(0, 0, 0, .46);
     position: fixed;
     inset: 0;
     z-index: 10000;
@@ -60,11 +259,14 @@
     color-scheme: dark;
 }
 
+#st_chat_viewer_modal.theme-sakura,
+#st_chat_viewer_modal.theme-paper { color-scheme: light; }
+
 #st_chat_viewer_modal.displayNone { display: none; }
 #st_chat_viewer_modal .st-chat-viewer-backdrop {
     position: absolute;
     inset: 0;
-    background: rgba(3, 6, 18, .78);
+    background: var(--viewer-backdrop);
     backdrop-filter: blur(16px) saturate(130%);
 }
 
@@ -75,10 +277,10 @@
     width: min(1240px, 95vw);
     height: min(900px, 90vh);
     overflow: hidden;
-    background: linear-gradient(145deg, #111b32 0%, #0c1325 100%) !important;
-    border: 1px solid rgba(151, 178, 235, .24) !important;
-    border-radius: 22px !important;
-    box-shadow: var(--viewer-shadow), inset 0 1px 0 rgba(255,255,255,.08);
+    background: var(--viewer-window-bg) !important;
+    border: 1px solid var(--viewer-window-border) !important;
+    border-radius: var(--viewer-radius) !important;
+    box-shadow: var(--viewer-shadow), inset 0 1px 0 rgba(255, 255, 255, .06);
 }
 
 #st_chat_viewer_modal .st-chat-viewer-header {
@@ -88,13 +290,13 @@
     gap: 16px;
     min-height: 82px;
     padding: 18px 24px;
-    background: linear-gradient(110deg, rgba(39, 61, 111, .66), rgba(21, 31, 62, .46));
+    background: var(--viewer-header-bg) !important;
     border-bottom: 1px solid var(--viewer-line);
 }
 
 #st_chat_viewer_modal .st-chat-viewer-header h3 {
     margin: 0 0 5px;
-    color: #fff !important;
+    color: var(--viewer-text) !important;
     font-size: 1.18rem;
     font-weight: 750;
     letter-spacing: .02em;
@@ -107,14 +309,15 @@
     min-height: 36px;
     place-items: center;
     padding: 0;
-    color: #dce8ff !important;
-    background: rgba(255,255,255,.07) !important;
-    border: 1px solid rgba(190, 208, 248, .18) !important;
+    color: var(--viewer-btn-text) !important;
+    background: var(--viewer-btn-bg) !important;
+    border: 1px solid var(--viewer-line) !important;
     border-radius: 10px;
     cursor: pointer;
     transition: .2s ease;
 }
-#st_chat_viewer_modal .st-chat-viewer-actions button:hover { background: rgba(124,156,255,.28) !important; transform: translateY(-1px); }
+#st_chat_viewer_modal .st-chat-viewer-actions button i { font-size: 1rem; }
+#st_chat_viewer_modal .st-chat-viewer-actions button:hover { background: var(--viewer-btn-bg-hover) !important; transform: translateY(-1px); }
 
 #st_chat_viewer_modal .st-chat-viewer-progress-wrap {
     display: flex;
@@ -123,22 +326,23 @@
     min-height: 58px;
     padding: 10px 24px;
     color: var(--viewer-muted) !important;
-    background: rgba(7, 13, 29, .48) !important;
+    background: var(--viewer-bar-bg) !important;
     border-bottom: 1px solid var(--viewer-line);
 }
-#st_chat_viewer_modal .st-chat-viewer-range { flex: 1; min-width: 80px; accent-color: var(--viewer-blue); cursor: pointer; }
+#st_chat_viewer_modal .st-chat-viewer-progress-wrap > i { color: var(--viewer-accent-2) !important; }
+#st_chat_viewer_modal .st-chat-viewer-range { flex: 1; min-width: 80px; accent-color: var(--viewer-accent); cursor: pointer; }
 #st_chat_viewer_modal .st-chat-viewer-percent {
     width: 62px;
     margin: 0;
     padding: 6px 8px;
     color: var(--viewer-text) !important;
     text-align: right;
-    background: rgba(255,255,255,.07) !important;
+    background: var(--viewer-input-bg) !important;
     border: 1px solid var(--viewer-line) !important;
     border-radius: 8px;
 }
 
-/* v1.3.0：显示模式开关行（只看正文 / HTML 渲染 / 酒馆助手美化） */
+/* 显示模式开关行（只看正文 / HTML 渲染 / 酒馆助手美化）+ 主题色板 */
 #st_chat_viewer_modal .st-chat-viewer-modes {
     display: flex;
     align-items: center;
@@ -146,7 +350,7 @@
     flex-wrap: wrap;
     min-height: 52px;
     padding: 8px 24px 12px;
-    background: rgba(7, 13, 29, .48) !important;
+    background: var(--viewer-bar-bg) !important;
     border-bottom: 1px solid var(--viewer-line);
 }
 #st_chat_viewer_modal .st-chat-viewer-modes-label {
@@ -156,13 +360,29 @@
     font-weight: 700;
     letter-spacing: .12em;
 }
+#st_chat_viewer_modal .st-chat-viewer-themes { display: inline-flex; align-items: center; gap: 7px; margin-left: auto; }
+#st_chat_viewer_modal .st-chat-viewer-theme-dot {
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    background: var(--dot-color, #7c9cff) !important;
+    border: 2px solid transparent !important;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: .18s ease;
+}
+#st_chat_viewer_modal .st-chat-viewer-theme-dot:hover { transform: scale(1.18); }
+#st_chat_viewer_modal .st-chat-viewer-theme-dot.is-active {
+    border-color: var(--viewer-text) !important;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--dot-color, #7c9cff) 45%, transparent);
+}
 
 #st_chat_viewer_modal .st-chat-viewer-body { display: flex; flex: 1; min-height: 0; }
 #st_chat_viewer_modal .st-chat-viewer-outline {
     flex: 0 0 310px;
     overflow-y: auto;
     padding: 14px 10px;
-    background: rgba(6, 12, 28, .38) !important;
+    background: var(--viewer-outline-bg) !important;
     border-right: 1px solid var(--viewer-line);
 }
 #st_chat_viewer_modal .st-chat-viewer-outline::before {
@@ -182,7 +402,7 @@
     align-items: flex-start;
     margin: 2px 0;
     padding: 10px 9px;
-    color: #b9c8e2 !important;
+    color: var(--viewer-muted) !important;
     text-align: left;
     background: transparent !important;
     border: 1px solid transparent !important;
@@ -191,11 +411,11 @@
     transition: .18s ease;
 }
 #st_chat_viewer_modal .st-chat-viewer-outline-item:hover {
-    color: #fff !important;
-    background: rgba(124,156,255,.12) !important;
-    border-color: rgba(124,156,255,.22) !important;
+    color: var(--viewer-text) !important;
+    background: color-mix(in srgb, var(--viewer-accent) 14%, transparent) !important;
+    border-color: color-mix(in srgb, var(--viewer-accent) 26%, transparent) !important;
 }
-#st_chat_viewer_modal .st-chat-viewer-outline-item .floor { flex: 0 0 29px; color: var(--viewer-cyan); font-size: .76rem; font-weight: 700; text-align: right; }
+#st_chat_viewer_modal .st-chat-viewer-outline-item .floor { flex: 0 0 29px; color: var(--viewer-accent-2); font-size: .76rem; font-weight: 700; text-align: right; }
 #st_chat_viewer_modal .st-chat-viewer-outline-item .outline-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 #st_chat_viewer_modal .st-chat-viewer-list {
@@ -203,7 +423,7 @@
     min-width: 0;
     overflow-y: auto;
     padding: 24px clamp(14px, 4vw, 54px) 46px;
-    background: radial-gradient(circle at 85% 0%, rgba(83, 117, 218, .13), transparent 35%);
+    background: var(--viewer-list-glow);
     scroll-behavior: smooth;
 }
 #st_chat_viewer_modal .st-chat-viewer-message {
@@ -212,33 +432,67 @@
     margin: 0 auto 18px;
     padding: 18px 20px;
     background: var(--viewer-card) !important;
-    border: 1px solid rgba(160, 183, 232, .14) !important;
-    border-left: 3px solid var(--viewer-purple) !important;
+    border: 1px solid var(--viewer-card-border) !important;
+    border-left: 3px solid var(--viewer-char-accent) !important;
     border-radius: 15px;
-    box-shadow: 0 8px 28px rgba(0,0,0,.14), inset 0 1px 0 rgba(255,255,255,.035);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, .12);
     scroll-margin-top: 18px;
     transition: border-color .2s, box-shadow .2s, transform .2s;
 }
-#st_chat_viewer_modal .st-chat-viewer-message.is-user { border-left-color: var(--viewer-cyan) !important; }
-#st_chat_viewer_modal .st-chat-viewer-message.is-highlighted { box-shadow: 0 0 0 2px var(--viewer-blue), 0 12px 34px rgba(62, 104, 229, .2); transform: translateY(-2px); }
+#st_chat_viewer_modal .st-chat-viewer-message.is-user {
+    background: var(--viewer-card-user) !important;
+    border-left-color: var(--viewer-user-accent) !important;
+}
+#st_chat_viewer_modal .st-chat-viewer-message.is-highlighted { box-shadow: 0 0 0 2px var(--viewer-accent), 0 12px 34px rgba(0, 0, 0, .18); transform: translateY(-2px); }
 #st_chat_viewer_modal .st-chat-viewer-message-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 12px; }
-#st_chat_viewer_modal .st-chat-viewer-message-head strong { color: #f2f6ff !important; font-size: .9rem; }
+#st_chat_viewer_modal .st-chat-viewer-message-head strong { color: var(--viewer-text) !important; font-size: .9rem; }
 #st_chat_viewer_modal .st-chat-viewer-message-head span,
 #st_chat_viewer_modal .st-chat-viewer-message-head time { color: var(--viewer-muted) !important; font-size: .74rem; }
 #st_chat_viewer_modal .st-chat-viewer-message-head time { margin-left: auto; }
-#st_chat_viewer_modal .st-chat-viewer-message-content { color: #dbe5f6 !important; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.72; }
-#st_chat_viewer_modal .st-chat-viewer-message-content.is-html { white-space: normal; }#st_chat_viewer_modal .st-chat-viewer-message-content.is-html p { margin: .65em 0; }
+#st_chat_viewer_modal .st-chat-viewer-message-content { color: var(--viewer-text) !important; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.72; }
+#st_chat_viewer_modal .st-chat-viewer-message-content.is-html { white-space: normal; }
+#st_chat_viewer_modal .st-chat-viewer-message-content.is-html p { margin: .65em 0; }
 #st_chat_viewer_modal .st-chat-viewer-message-content.is-html p:first-child { margin-top: 0; }
 #st_chat_viewer_modal .st-chat-viewer-message-content.is-html p:last-child { margin-bottom: 0; }
-#st_chat_viewer_modal .st-chat-viewer-message-content.is-html a { color: var(--viewer-cyan) !important; text-decoration: underline; }
+#st_chat_viewer_modal .st-chat-viewer-message-content.is-html a { color: var(--viewer-accent-2) !important; text-decoration: underline; }
 #st_chat_viewer_modal .st-chat-viewer-message-content.is-html img { max-width: 100%; height: auto; border-radius: 10px; }
-#st_chat_viewer_modal .st-chat-viewer-message-content.is-html pre { overflow: auto; padding: 12px; background: #080d1b !important; border: 1px solid var(--viewer-line); border-radius: 9px; }
-#st_chat_viewer_modal .st-chat-viewer-message-content.is-html code { padding: 2px 5px; color: #d9c8ff; background: rgba(167,139,250,.13) !important; border-radius: 4px; }
-#st_chat_viewer_modal .st-chat-viewer-message-content.is-html blockquote { margin: 10px 0; padding: 8px 14px; color: #aebed8; border-left: 3px solid var(--viewer-purple); background: rgba(167,139,250,.08) !important; }
-#st_chat_viewer_modal .st-chat-viewer-message-content.is-plain { color: #dbe5f6 !important; }
+#st_chat_viewer_modal .st-chat-viewer-message-content.is-html pre { overflow: auto; padding: 12px; background: var(--viewer-code-bg) !important; border: 1px solid var(--viewer-line); border-radius: 9px; }
+#st_chat_viewer_modal .st-chat-viewer-message-content.is-html code { padding: 2px 5px; color: var(--viewer-code-text) !important; background: color-mix(in srgb, var(--viewer-accent-3) 14%, transparent) !important; border-radius: 4px; }
+#st_chat_viewer_modal .st-chat-viewer-message-content.is-html blockquote { margin: 10px 0; padding: 8px 14px; color: var(--viewer-quote-text) !important; border-left: 3px solid var(--viewer-accent-3); background: var(--viewer-quote-bg) !important; }
+#st_chat_viewer_modal .st-chat-viewer-message-content.is-plain { color: var(--viewer-text) !important; }
 #st_chat_viewer_modal .st-chat-viewer-message-content.is-helper { padding: 0; overflow: hidden; border-radius: 10px; }
 #st_chat_viewer_modal .st-chat-viewer-helper-frame { display: block; width: 100%; min-height: 60px; border: 0; border-radius: 10px; background: #fff; }
 #st_chat_viewer_modal .st-chat-viewer-empty { padding: 60px 20px; color: var(--viewer-muted) !important; text-align: center; }
+
+/* 标题栏模式徽标 */
+#st_chat_viewer_modal .st-chat-viewer-meta { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+#st_chat_viewer_modal .st-chat-viewer-mode {
+    display: inline-flex; align-items: center; min-height: 20px; padding: 2px 8px;
+    color: var(--viewer-muted) !important; font-size: .68rem; font-weight: 700; letter-spacing: .04em;
+    background: var(--viewer-btn-bg) !important; border: 1px solid var(--viewer-line) !important; border-radius: 999px;
+}
+#st_chat_viewer_modal .st-chat-viewer-mode.is-active { color: var(--viewer-ok) !important; background: color-mix(in srgb, var(--viewer-ok) 12%, transparent) !important; border-color: color-mix(in srgb, var(--viewer-ok) 32%, transparent) !important; }
+
+/* 三个显示模式开关（胶囊式） */
+#st_chat_viewer_modal .st-chat-viewer-mode-toggle {
+    position: relative; display: inline-flex !important; align-items: center; gap: 8px; min-height: 38px;
+    padding: 4px 10px 4px 8px; color: var(--viewer-btn-text) !important; background: var(--viewer-btn-bg) !important;
+    border: 1px solid var(--viewer-line) !important; border-radius: 11px; cursor: pointer; transition: .2s ease;
+}
+#st_chat_viewer_modal .st-chat-viewer-mode-toggle:hover { background: color-mix(in srgb, var(--viewer-accent) 12%, transparent) !important; border-color: color-mix(in srgb, var(--viewer-accent) 42%, transparent) !important; }
+#st_chat_viewer_modal .st-chat-viewer-mode-toggle:has(input:checked) { background: color-mix(in srgb, var(--viewer-ok) 8%, transparent) !important; border-color: color-mix(in srgb, var(--viewer-ok) 42%, transparent) !important; }
+#st_chat_viewer_modal .st-chat-viewer-toggle-icon { display: grid; width: 24px; height: 24px; place-items: center; font-size: .78rem; background: var(--viewer-btn-bg) !important; border-radius: 7px; }
+#st_chat_viewer_modal .st-chat-viewer-mode-toggle[data-mode="text"] .st-chat-viewer-toggle-icon { color: var(--viewer-ok) !important; background: color-mix(in srgb, var(--viewer-ok) 13%, transparent) !important; }
+#st_chat_viewer_modal .st-chat-viewer-mode-toggle[data-mode="html"] .st-chat-viewer-toggle-icon { color: var(--viewer-accent-2) !important; background: color-mix(in srgb, var(--viewer-accent-2) 13%, transparent) !important; }
+#st_chat_viewer_modal .st-chat-viewer-mode-toggle[data-mode="helper"] .st-chat-viewer-toggle-icon { color: var(--viewer-accent-3) !important; background: color-mix(in srgb, var(--viewer-accent-3) 14%, transparent) !important; }
+#st_chat_viewer_modal .st-chat-viewer-toggle-copy { display: flex !important; flex: 1 1 auto; flex-direction: column !important; gap: 1px; line-height: 1.1; white-space: nowrap; }
+#st_chat_viewer_modal .st-chat-viewer-toggle-copy b { color: var(--viewer-text) !important; font-size: .76rem; }
+#st_chat_viewer_modal .st-chat-viewer-toggle-copy small { color: var(--viewer-muted) !important; font-size: .62rem; }
+#st_chat_viewer_modal .st-chat-viewer-mode-toggle > input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+#st_chat_viewer_modal .st-chat-viewer-switch { position: relative; flex: 0 0 34px; width: 34px; height: 20px; background: var(--viewer-switch-off-bg) !important; border: 1px solid var(--viewer-line); border-radius: 20px; transition: .2s ease; }
+#st_chat_viewer_modal .st-chat-viewer-switch::after { position: absolute; top: 3px; left: 3px; width: 12px; height: 12px; content: ""; background: var(--viewer-switch-knob); border-radius: 50%; transition: .2s ease; }
+#st_chat_viewer_modal .st-chat-viewer-mode-toggle > input:checked ~ .st-chat-viewer-switch { background: color-mix(in srgb, var(--viewer-ok) 75%, #1a4a38) !important; border-color: var(--viewer-ok); }
+#st_chat_viewer_modal .st-chat-viewer-mode-toggle > input:checked ~ .st-chat-viewer-switch::after { left: 17px; background: var(--viewer-switch-knob-on); }
 
 @media (max-width: 760px) {
     #st_chat_viewer_modal .st-chat-viewer-window { width: 100vw; height: 100vh; border-radius: 0 !important; }
@@ -248,35 +502,8 @@
     #st_chat_viewer_modal .st-chat-viewer-percent { order: 1; }
     #st_chat_viewer_modal .st-chat-viewer-modes { gap: 6px; padding: 6px 15px 10px; }
     #st_chat_viewer_modal .st-chat-viewer-mode-toggle { flex: 1 1 40%; min-height: 34px; }
+    #st_chat_viewer_modal .st-chat-viewer-themes { width: 100%; margin-left: 0; }
     #st_chat_viewer_modal .st-chat-viewer-message { padding: 14px; border-radius: 12px; }
     #st_chat_viewer_modal .st-chat-viewer-message-head { flex-wrap: wrap; gap: 4px 8px; }
     #st_chat_viewer_modal .st-chat-viewer-message-head time { width: 100%; margin-left: 0; }
 }
-
-/* v1.3.0：三个显示模式开关（胶囊式） */
-#st_chat_viewer_modal .st-chat-viewer-meta { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
-#st_chat_viewer_modal .st-chat-viewer-mode {
-    display: inline-flex; align-items: center; min-height: 20px; padding: 2px 8px;
-    color: #afbdd7 !important; font-size: .68rem; font-weight: 700; letter-spacing: .04em;
-    background: rgba(255,255,255,.07) !important; border: 1px solid rgba(180,200,240,.14) !important; border-radius: 999px;
-}
-#st_chat_viewer_modal .st-chat-viewer-mode.is-active { color: #8ff0ce !important; background: rgba(94,231,173,.12) !important; border-color: rgba(94,231,173,.3) !important; }
-#st_chat_viewer_modal .st-chat-viewer-mode-toggle {
-    position: relative; display: inline-flex !important; align-items: center; gap: 8px; min-height: 38px;
-    padding: 4px 10px 4px 8px; color: #dce8ff !important; background: rgba(255,255,255,.04) !important;
-    border: 1px solid rgba(180,200,240,.16) !important; border-radius: 11px; cursor: pointer; transition: .2s ease;
-}
-#st_chat_viewer_modal .st-chat-viewer-mode-toggle:hover { background: rgba(124,156,255,.1) !important; border-color: rgba(124,156,255,.42) !important; }
-#st_chat_viewer_modal .st-chat-viewer-mode-toggle:has(input:checked) { background: rgba(94,231,173,.07) !important; border-color: rgba(94,231,173,.4) !important; }
-#st_chat_viewer_modal .st-chat-viewer-toggle-icon { display: grid; width: 24px; height: 24px; place-items: center; font-size: .78rem; background: rgba(255,255,255,.08) !important; border-radius: 7px; }
-#st_chat_viewer_modal .st-chat-viewer-mode-toggle[data-mode="text"] .st-chat-viewer-toggle-icon { color: var(--viewer-green) !important; background: rgba(94,231,173,.12) !important; }
-#st_chat_viewer_modal .st-chat-viewer-mode-toggle[data-mode="html"] .st-chat-viewer-toggle-icon { color: var(--viewer-cyan) !important; background: rgba(100,217,255,.13) !important; }
-#st_chat_viewer_modal .st-chat-viewer-mode-toggle[data-mode="helper"] .st-chat-viewer-toggle-icon { color: var(--viewer-purple) !important; background: rgba(167,139,250,.14) !important; }
-#st_chat_viewer_modal .st-chat-viewer-toggle-copy { display: flex !important; flex: 1 1 auto; flex-direction: column !important; gap: 1px; line-height: 1.1; white-space: nowrap; }
-#st_chat_viewer_modal .st-chat-viewer-toggle-copy b { color: #eef5ff !important; font-size: .76rem; }
-#st_chat_viewer_modal .st-chat-viewer-toggle-copy small { color: #91a4c4 !important; font-size: .62rem; }
-#st_chat_viewer_modal .st-chat-viewer-mode-toggle > input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
-#st_chat_viewer_modal .st-chat-viewer-switch { position: relative; flex: 0 0 34px; width: 34px; height: 20px; background: #2b3852 !important; border: 1px solid rgba(210,225,255,.18); border-radius: 20px; transition: .2s ease; }
-#st_chat_viewer_modal .st-chat-viewer-switch::after { position: absolute; top: 3px; left: 3px; width: 12px; height: 12px; content: ""; background: #9aaaca; border-radius: 50%; transition: .2s ease; }
-#st_chat_viewer_modal .st-chat-viewer-mode-toggle > input:checked ~ .st-chat-viewer-switch { background: #258b81 !important; border-color: #5ee7ad; }
-#st_chat_viewer_modal .st-chat-viewer-mode-toggle > input:checked ~ .st-chat-viewer-switch::after { left: 17px; background: #effff8; }

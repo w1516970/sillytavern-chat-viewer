@@ -21,11 +21,33 @@ const MODE_STORAGE_KEYS = {
     helper: `${EXTENSION_ID}:helper-enabled`,
 };
 
+const THEME_STORAGE_KEY = `${EXTENSION_ID}:theme`;
+const THEMES = [
+    { id: 'tavern', name: '跟随酒馆' },
+    { id: 'midnight', name: '深空蓝' },
+    { id: 'aurora', name: '极光' },
+    { id: 'sakura', name: '樱粉' },
+    { id: 'sunset', name: '落日' },
+    { id: 'paper', name: '纸墨' },
+];
+// 各主题对应的魔法棒入口按钮颜色；tavern 主题运行时读取酒馆主题色
+const THEME_WAND_COLORS = {
+    tavern: '#a78bfa',
+    midnight: '#7c9cff',
+    aurora: '#43e5a0',
+    sakura: '#e0568c',
+    sunset: '#ff9e64',
+    paper: '#8a6d3b',
+};
+
 const modes = {
     text: localStorage.getItem(MODE_STORAGE_KEYS.text) === 'true',
     html: localStorage.getItem(MODE_STORAGE_KEYS.html) === 'true',
     helper: localStorage.getItem(MODE_STORAGE_KEYS.helper) === 'true',
 };
+
+let theme = localStorage.getItem(THEME_STORAGE_KEY) || 'midnight';
+if (!THEME_WAND_COLORS[theme]) theme = 'midnight';
 
 function escapeText(value) {
     return value == null ? '' : String(value);
@@ -138,6 +160,51 @@ function ensureWandButton() {
     if (!container.querySelector(`.${EXTENSION_ID}_open_button`)) {
         createButton(container, '独立查看聊天记录', 'fa-book-open', openViewer, `${EXTENSION_ID}_open_button`);
     }
+    applyTheme();
+}
+
+function applyTheme() {
+    if (modal) {
+        THEMES.forEach(({ id }) => modal.classList.remove(`theme-${id}`));
+        modal.classList.add(`theme-${theme}`);
+    }
+    // 魔法棒入口按钮颜色跟随主题；跟随酒馆模式实时读取酒馆主题色
+    let wandColor = THEME_WAND_COLORS[theme];
+    if (theme === 'tavern') {
+        const tavernColor = (getComputedStyle(document.documentElement)
+            .getPropertyValue('--SmartThemeQuoteColor') || '').trim();
+        if (tavernColor) wandColor = tavernColor;
+    }
+    const container = document.getElementById(WAND_CONTAINER_ID);
+    if (container) container.style.setProperty('--viewer-wand-color', wandColor);
+    modal?.querySelectorAll('.st-chat-viewer-theme-dot').forEach(dot => {
+        dot.classList.toggle('is-active', dot.dataset.theme === theme);
+    });
+}
+
+function buildThemeDots(parent) {
+    const label = document.createElement('span');
+    label.className = 'st-chat-viewer-modes-label';
+    label.textContent = '主题';
+    const wrap = document.createElement('span');
+    wrap.className = 'st-chat-viewer-themes';
+    THEMES.forEach(({ id, name }) => {
+        const dot = document.createElement('button');
+        dot.type = 'button';
+        dot.className = 'st-chat-viewer-theme-dot';
+        dot.dataset.theme = id;
+        dot.title = `主题：${name}`;
+        dot.setAttribute('aria-label', `主题：${name}`);
+        dot.style.setProperty('--dot-color', THEME_WAND_COLORS[id]);
+        dot.addEventListener('click', () => {
+            if (theme === id) return;
+            theme = id;
+            localStorage.setItem(THEME_STORAGE_KEY, theme);
+            applyTheme();
+        });
+        wrap.appendChild(dot);
+    });
+    parent.append(label, wrap);
 }
 
 function buildModeToggle(mode, icon, title, subtitle) {
@@ -200,6 +267,8 @@ function buildModal() {
     modesRow.appendChild(buildModeToggle('text', 'fa-align-left', '只看正文', '屏蔽 HTML 与美化内容'));
     modesRow.appendChild(buildModeToggle('html', 'fa-code', 'HTML 渲染', '安全渲染网页排版'));
     modesRow.appendChild(buildModeToggle('helper', 'fa-wand-magic-sparkles', '酒馆助手美化', '渲染 <body> 美化块'));
+    buildThemeDots(modesRow);
+    applyTheme();
 
     modal.querySelector('.st-chat-viewer-backdrop').addEventListener('click', closeViewer);
     modal.querySelector('.st-chat-viewer-close').addEventListener('click', closeViewer);
