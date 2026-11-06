@@ -183,11 +183,14 @@ function applyTheme() {
 }
 
 function buildThemeDots(parent) {
+    // “主题”标签与色板圆点放在同一组，右对齐并与左侧开关用分隔线隔开
+    const group = document.createElement('span');
+    group.className = 'st-chat-viewer-themes';
     const label = document.createElement('span');
     label.className = 'st-chat-viewer-modes-label';
     label.textContent = '主题';
-    const wrap = document.createElement('span');
-    wrap.className = 'st-chat-viewer-themes';
+    const dots = document.createElement('span');
+    dots.className = 'st-chat-viewer-theme-dots';
     THEMES.forEach(({ id, name }) => {
         const dot = document.createElement('button');
         dot.type = 'button';
@@ -202,9 +205,10 @@ function buildThemeDots(parent) {
             localStorage.setItem(THEME_STORAGE_KEY, theme);
             applyTheme();
         });
-        wrap.appendChild(dot);
+        dots.appendChild(dot);
     });
-    parent.append(label, wrap);
+    group.append(label, dots);
+    parent.appendChild(group);
 }
 
 function buildModeToggle(mode, icon, title, subtitle) {
@@ -218,6 +222,7 @@ function buildModeToggle(mode, icon, title, subtitle) {
         + `<span class="st-chat-viewer-switch" aria-hidden="true"></span>`;
     const input = label.querySelector('input');
     input.setAttribute('aria-label', title);
+    modeInputs[mode] = input;
     input.addEventListener('change', () => setMode(mode, input.checked));
     return label;
 }
@@ -286,6 +291,7 @@ function buildModal() {
 }
 
 function setMode(changed, value) {
+    modes[changed] = value;
     if (changed === 'text' && value) {
         // 只看正文开启时，其余两个模式自动关闭
         modes.html = false;

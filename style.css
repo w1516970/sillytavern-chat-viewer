@@ -360,7 +360,15 @@
     font-weight: 700;
     letter-spacing: .12em;
 }
-#st_chat_viewer_modal .st-chat-viewer-themes { display: inline-flex; align-items: center; gap: 7px; margin-left: auto; }
+#st_chat_viewer_modal .st-chat-viewer-themes {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    margin-left: auto;
+    padding-left: 16px;
+    border-left: 1px solid var(--viewer-line);
+}
+#st_chat_viewer_modal .st-chat-viewer-theme-dots { display: inline-flex; align-items: center; gap: 7px; }
 #st_chat_viewer_modal .st-chat-viewer-theme-dot {
     width: 20px;
     height: 20px;
@@ -375,6 +383,18 @@
 #st_chat_viewer_modal .st-chat-viewer-theme-dot.is-active {
     border-color: var(--viewer-text) !important;
     box-shadow: 0 0 0 2px color-mix(in srgb, var(--dot-color, #7c9cff) 45%, transparent);
+}
+/* 「跟随酒馆」色板：透明圆点 + 虚线描边，表示随酒馆主题自动变化 */
+#st_chat_viewer_modal .st-chat-viewer-theme-dot[data-theme="tavern"] {
+    background: transparent !important;
+    border: 2px dashed var(--viewer-muted) !important;
+}
+#st_chat_viewer_modal .st-chat-viewer-theme-dot[data-theme="tavern"]:hover {
+    border-color: var(--viewer-accent) !important;
+}
+#st_chat_viewer_modal .st-chat-viewer-theme-dot[data-theme="tavern"].is-active {
+    border: 2px solid var(--viewer-accent) !important;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--viewer-accent) 30%, transparent);
 }
 
 #st_chat_viewer_modal .st-chat-viewer-body { display: flex; flex: 1; min-height: 0; }
@@ -473,9 +493,10 @@
 }
 #st_chat_viewer_modal .st-chat-viewer-mode.is-active { color: var(--viewer-ok) !important; background: color-mix(in srgb, var(--viewer-ok) 12%, transparent) !important; border-color: color-mix(in srgb, var(--viewer-ok) 32%, transparent) !important; }
 
-/* 三个显示模式开关（胶囊式） */
+/* 三个显示模式开关（胶囊式）：固定等宽，保证一行内对齐 */
 #st_chat_viewer_modal .st-chat-viewer-mode-toggle {
-    position: relative; display: inline-flex !important; align-items: center; gap: 8px; min-height: 38px;
+    position: relative; display: inline-flex !important; align-items: center; gap: 8px;
+    width: 186px; min-height: 38px;
     padding: 4px 10px 4px 8px; color: var(--viewer-btn-text) !important; background: var(--viewer-btn-bg) !important;
     border: 1px solid var(--viewer-line) !important; border-radius: 11px; cursor: pointer; transition: .2s ease;
 }
@@ -501,8 +522,11 @@
     #st_chat_viewer_modal .st-chat-viewer-range { order: 1; flex-basis: 70%; }
     #st_chat_viewer_modal .st-chat-viewer-percent { order: 1; }
     #st_chat_viewer_modal .st-chat-viewer-modes { gap: 6px; padding: 6px 15px 10px; }
-    #st_chat_viewer_modal .st-chat-viewer-mode-toggle { flex: 1 1 40%; min-height: 34px; }
-    #st_chat_viewer_modal .st-chat-viewer-themes { width: 100%; margin-left: 0; }
+    #st_chat_viewer_modal .st-chat-viewer-mode-toggle { flex: 1 1 40%; width: auto; min-height: 34px; }
+    #st_chat_viewer_modal .st-chat-viewer-themes {
+        width: 100%; margin-left: 0; padding: 8px 0 0;
+        border-left: 0; border-top: 1px solid var(--viewer-line);
+    }
     #st_chat_viewer_modal .st-chat-viewer-message { padding: 14px; border-radius: 12px; }
     #st_chat_viewer_modal .st-chat-viewer-message-head { flex-wrap: wrap; gap: 4px 8px; }
     #st_chat_viewer_modal .st-chat-viewer-message-head time { width: 100%; margin-left: 0; }
