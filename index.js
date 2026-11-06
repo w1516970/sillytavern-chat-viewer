@@ -2,6 +2,8 @@ const context = SillyTavern.getContext();
 const EXTENSION_ID = 'st_chat_viewer';
 const WAND_CONTAINER_ID = `${EXTENSION_ID}_wand_container`;
 const MODAL_ID = `${EXTENSION_ID}_modal`;
+// 酒馆助手（TavernHelper / JS-slash-runner）美化内容的约定：消息正文里的 <body> 块
+const HELPER_BODY_RE = /<body[^>]*>([\s\S]*?)<\/body>/i;
 
 let modal;
 let list;
@@ -9,10 +11,21 @@ let outline;
 let range;
 let percentInput;
 let status;
-let htmlToggle;
-let htmlModeLabel;
+let modeLabel;
+let modeInputs = {};
 let lastChatSignature = '';
-let htmlEnabled = localStorage.getItem(`${EXTENSION_ID}:html-enabled`) === 'true';
+
+const MODE_STORAGE_KEYS = {
+    text: `${EXTENSION_ID}:text-only`,
+    html: `${EXTENSION_ID}:html-enabled`,
+    helper: `${EXTENSION_ID}:helper-enabled`,
+};
+
+const modes = {
+    text: localStorage.getItem(MODE_STORAGE_KEYS.text) === 'true',
+    html: localStorage.getItem(MODE_STORAGE_KEYS.html) === 'true',
+    helper: localStorage.getItem(MODE_STORAGE_KEYS.helper) === 'true',
+};
 
 function escapeText(value) {
     return value == null ? '' : String(value);
@@ -29,8 +42,24 @@ function getSpeaker(message) {
     return escapeText(message.name || '角色');
 }
 
-function getMessageText(message) {
+function getMessageRaw(message) {
     return escapeText(message.mes ?? message.message ?? '').trim();
+}
+
+function extractPlainText(raw, fallback = '') {
+    const template = document.createElement('template');
+    template.innerHTML = escapeText(raw);
+    // 去掉脚本、样式和酒馆助手美化块，只保留正文文本
+    template.content.querySelectorAll('script,style,body,iframe,object,embed,template,link,meta')
+        .forEach(node => node.remove());
+    template.content.querySelectorAll('br').forEach(node => node.replaceWith(document.createTextNode('\n')));
+    template.content.querySelectorAll('p,div,section,article,li,tr,h1,h2,h3,h4,h5,h6,blockquote,pre,hr')
+        .forEach(node => node.append('\n'));
+    const plain = (template.content.textContent || '')
+        .replace(/[ \t]+\n/g, '\n')
+        .replace(/\n{3,}/g, '\n\n')
+        .trim();
+    return plain || fallback;
 }
 
 function sanitizeHtml(value) {
@@ -53,6 +82,30 @@ function sanitizeHtml(value) {
         });
     });
     return template.innerHTML;
+}
+
+function buildHelperFrame(raw) {
+    const match = raw.match(HELPER_BODY_RE);
+    const frame = document.createElement('iframe');
+    frame.className = 'st-chat-viewer-helper-frame';
+    // 不授予 allow-scripts：美化排版正常显示，但其中的脚本一律不执行
+    frame.setAttribute('sandbox', 'allow-same-origin');
+    frame.setAttribute('loading', 'lazy');
+    frame.title = '酒馆助手美化内容';
+    frame.addEventListener('load', () => {
+        try {
+            const doc = frame.contentDocument;
+            const height = doc?.documentElement?.scrollHeight || 0;
+            frame.style.height = `${Math.max(60, Math.min(height + 16, 4000))}px`;
+        } catch (error) {
+            frame.style.height = '320px';
+        }
+    });
+    frame.srcdoc = `<!doctype html><html><head><meta charset="utf-8"><style>`
+        + `body{margin:0;padding:12px;background:#fff;color:#1f2430;font-family:inherit;overflow-wrap:anywhere;}`
+        + `img{max-width:100%;height:auto;}table{border-collapse:collapse;}td,th{border:1px solid #ccc;padding:4px 8px;}`
+        + `</style></head><body>${match ? match[1] : ''}</body></html>`;
+    return frame;
 }
 
 function createButton(parent, label, icon, handler, extraClass = '') {
@@ -85,23 +138,21 @@ function ensureWandButton() {
     if (!container.querySelector(`.${EXTENSION_ID}_open_button`)) {
         createButton(container, '独立查看聊天记录', 'fa-book-open', openViewer, `${EXTENSION_ID}_open_button`);
     }
+}
 
-    const settings = document.getElementById('extensions_settings');
-    if (settings && !settings.querySelector(`.${EXTENSION_ID}_settings_button`)) {
-        const wrapper = document.createElement('div');
-        wrapper.className = `inline-drawer ${EXTENSION_ID}_settings_panel`;
-        const header = document.createElement('div');
-        header.className = `inline-drawer-toggle inline-drawer-header ${EXTENSION_ID}_settings_header`;
-        header.innerHTML = '<span class="st-chat-viewer-settings-title"><i class="fa-solid fa-book-open"></i><b>独立聊天记录查看器</b></span><span class="st-chat-viewer-settings-subtitle">快速浏览当前对话</span><div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>';
-        const content = document.createElement('div');
-        content.className = `inline-drawer-content ${EXTENSION_ID}_settings_content`;
-        createButton(content, '打开当前聊天记录', 'fa-book-open', openViewer, `${EXTENSION_ID}_settings_button`);
-        const hint = document.createElement('small');
-        hint.textContent = '也可以从输入框右侧的魔法棒菜单打开。';
-        content.appendChild(hint);
-        wrapper.append(header, content);
-        settings.appendChild(wrapper);
-    }
+function buildModeToggle(mode, icon, title, subtitle) {
+    const label = document.createElement('label');
+    label.className = 'st-chat-viewer-mode-toggle';
+    label.dataset.mode = mode;
+    label.title = title;
+    label.innerHTML = `<span class="st-chat-viewer-toggle-icon"><i class="fa-solid ${icon}"></i></span>`
+        + `<span class="st-chat-viewer-toggle-copy"><b>${title}</b><small>${subtitle}</small></span>`
+        + `<input type="checkbox"${modes[mode] ? ' checked' : ''}>`
+        + `<span class="st-chat-viewer-switch" aria-hidden="true"></span>`;
+    const input = label.querySelector('input');
+    input.setAttribute('aria-label', title);
+    input.addEventListener('change', () => setMode(mode, input.checked));
+    return label;
 }
 
 function buildModal() {
@@ -118,8 +169,8 @@ function buildModal() {
                     <div class="st-chat-viewer-meta"><span class="st-chat-viewer-status"></span><span class="st-chat-viewer-mode"></span></div>
                 </div>
                 <div class="st-chat-viewer-actions">
-                    <button class="menu_button st-chat-viewer-top" title="回到顶部"><i class="fa-solid fa-arrow-up"></i></button>
-                    <button class="menu_button st-chat-viewer-close" title="关闭"><i class="fa-solid fa-xmark"></i></button>
+                    <button class="menu_button st-chat-viewer-top" title="回到顶部" aria-label="回到顶部"><i class="fa-solid fa-arrow-up"></i></button>
+                    <button class="menu_button st-chat-viewer-close" title="关闭" aria-label="关闭"><i class="fa-solid fa-xmark"></i></button>
                 </div>
             </header>
             <div class="st-chat-viewer-progress-wrap">
@@ -127,12 +178,9 @@ function buildModal() {
                 <input class="st-chat-viewer-range" type="range" min="0" max="100" value="0" step="0.1" aria-label="聊天记录进度">
                 <input class="st-chat-viewer-percent" type="number" min="0" max="100" step="0.1" value="0" aria-label="聊天记录百分比">
                 <span>%</span>
-                <label class="st-chat-viewer-html-toggle" title="开启后在查看器内渲染消息中的安全 HTML">
-                    <span class="st-chat-viewer-toggle-icon"><i class="fa-solid fa-code"></i></span>
-                    <span class="st-chat-viewer-toggle-copy"><b>HTML 渲染</b><small>安全显示网页排版</small></span>
-                    <input type="checkbox" aria-label="HTML 渲染" ${htmlEnabled ? 'checked' : ''}>
-                    <span class="st-chat-viewer-switch" aria-hidden="true"></span>
-                </label>
+            </div>
+            <div class="st-chat-viewer-modes">
+                <span class="st-chat-viewer-modes-label">显示模式</span>
             </div>
             <div class="st-chat-viewer-body">
                 <aside class="st-chat-viewer-outline" aria-label="楼层目录"></aside>
@@ -145,9 +193,13 @@ function buildModal() {
     range = modal.querySelector('.st-chat-viewer-range');
     percentInput = modal.querySelector('.st-chat-viewer-percent');
     status = modal.querySelector('.st-chat-viewer-status');
-    htmlModeLabel = modal.querySelector('.st-chat-viewer-mode');
-    htmlToggle = modal.querySelector('.st-chat-viewer-html-toggle input');
-    updateHtmlModeLabel();
+    modeLabel = modal.querySelector('.st-chat-viewer-mode');
+    modeInputs = {};
+
+    const modesRow = modal.querySelector('.st-chat-viewer-modes');
+    modesRow.appendChild(buildModeToggle('text', 'fa-align-left', '只看正文', '屏蔽 HTML 与美化内容'));
+    modesRow.appendChild(buildModeToggle('html', 'fa-code', 'HTML 渲染', '安全渲染网页排版'));
+    modesRow.appendChild(buildModeToggle('helper', 'fa-wand-magic-sparkles', '酒馆助手美化', '渲染 <body> 美化块'));
 
     modal.querySelector('.st-chat-viewer-backdrop').addEventListener('click', closeViewer);
     modal.querySelector('.st-chat-viewer-close').addEventListener('click', closeViewer);
@@ -157,16 +209,45 @@ function buildModal() {
         const value = Math.max(0, Math.min(100, Number(percentInput.value) || 0));
         scrollToPercent(value);
     });
-    htmlToggle.addEventListener('change', () => {
-        htmlEnabled = htmlToggle.checked;
-        localStorage.setItem(`${EXTENSION_ID}:html-enabled`, String(htmlEnabled));
-        updateHtmlModeLabel();
-        renderViewer();
-    });
     list.addEventListener('scroll', updateProgressFromScroll, { passive: true });
     document.addEventListener('keydown', event => {
         if (event.key === 'Escape' && modal && !modal.classList.contains('displayNone')) closeViewer();
     });
+    updateModeLabel();
+}
+
+function setMode(changed, value) {
+    if (changed === 'text' && value) {
+        // 只看正文开启时，其余两个模式自动关闭
+        modes.html = false;
+        modes.helper = false;
+    }
+    if ((changed === 'html' || changed === 'helper') && value) {
+        modes.text = false;
+    }
+    Object.entries(MODE_STORAGE_KEYS).forEach(([key, storageKey]) => {
+        localStorage.setItem(storageKey, String(modes[key]));
+    });
+    Object.entries(modeInputs).forEach(([key, input]) => {
+        if (input) input.checked = modes[key];
+    });
+    updateModeLabel();
+    renderViewer();
+}
+
+function updateModeLabel() {
+    if (!modeLabel) return;
+    let label = '纯文本模式';
+    if (modes.text) {
+        label = '只看正文';
+    } else {
+        const active = [];
+        if (modes.html) active.push('HTML');
+        if (modes.helper) active.push('酒馆助手美化');
+        label = active.length ? `正在渲染：${active.join(' + ')}` : '纯文本模式';
+    }
+    modeLabel.textContent = label;
+    modeLabel.classList.toggle('is-active', modes.text || modes.html || modes.helper);
 }
 
 function renderViewer() {
@@ -188,7 +269,8 @@ function renderViewer() {
 
     messages.forEach((message, index) => {
         const floor = index + 1;
-        const text = getMessageText(message);
+        const raw = getMessageRaw(message);
+        const hasHelper = HELPER_BODY_RE.test(raw);
         const card = document.createElement('article');
         card.className = `st-chat-viewer-message ${message.is_user ? 'is-user' : 'is-character'}`;
         card.id = `${EXTENSION_ID}_floor_${index}`;
@@ -204,20 +286,29 @@ function renderViewer() {
         head.append(speaker, floorLabel, date);
         const content = document.createElement('div');
         content.className = 'st-chat-viewer-message-content';
-        if (htmlEnabled && text) {
+
+        if (modes.text) {
+            content.classList.add('is-plain');
+            content.textContent = extractPlainText(raw, hasHelper ? '（该楼为酒馆助手美化楼层，无纯文本正文）' : '（空消息）');
+        } else if (modes.helper && hasHelper) {
+            content.classList.add('is-helper');
+            content.appendChild(buildHelperFrame(raw));
+        } else if (modes.html && raw) {
             content.classList.add('is-html');
-            content.innerHTML = sanitizeHtml(text);
+            content.innerHTML = sanitizeHtml(raw);
         } else {
-            content.textContent = text || '（空消息）';
+            content.textContent = raw || '（空消息）';
         }
         card.append(head, content);
         list.appendChild(card);
 
+        const previewSource = hasHelper ? extractPlainText(raw, '') : raw;
+        const previewText = hasHelper && !previewSource ? '（酒馆助手美化楼层）' : previewSource;
         const item = document.createElement('button');
         item.className = 'st-chat-viewer-outline-item';
         item.type = 'button';
         item.innerHTML = `<span class="floor">${floor}</span><span class="outline-text"></span>`;
-        item.querySelector('.outline-text').textContent = `${getSpeaker(message)}：${text.replace(/\s+/g, ' ').slice(0, 80) || '（空消息）'}`;
+        item.querySelector('.outline-text').textContent = `${getSpeaker(message)}：${previewText.replace(/\s+/g, ' ').slice(0, 80) || '（空消息）'}`;
         item.addEventListener('click', () => {
             card.scrollIntoView({ behavior: 'smooth', block: 'start' });
             card.classList.add('is-highlighted');
@@ -226,12 +317,6 @@ function renderViewer() {
         outline.appendChild(item);
     });
     updateProgressFromScroll();
-}
-
-function updateHtmlModeLabel() {
-    if (!htmlModeLabel) return;
-    htmlModeLabel.textContent = htmlEnabled ? 'HTML 已开启' : '纯文本模式';
-    htmlModeLabel.classList.toggle('is-active', htmlEnabled);
 }
 
 function scrollToPercent(value) {

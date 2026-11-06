@@ -28,6 +28,13 @@
     font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
 }
 
+/* 修复：上面的 font-family 覆盖会吞掉 Font Awesome 图标，导致按钮显示为方块 */
+#st_chat_viewer_modal i[class*="fa-"] {
+    font-family: "Font Awesome 6 Free", "Font Awesome 6 Pro", "FontAwesome" !important;
+    font-weight: 900 !important;
+    font-style: normal !important;
+}
+
 #st_chat_viewer_modal {
     --viewer-bg: #0b1020;
     --viewer-panel: #111a2e;
@@ -130,19 +137,25 @@
     border: 1px solid var(--viewer-line) !important;
     border-radius: 8px;
 }
-#st_chat_viewer_modal .st-chat-viewer-html-toggle {
-    display: inline-flex;
+
+/* v1.3.0：显示模式开关行（只看正文 / HTML 渲染 / 酒馆助手美化） */
+#st_chat_viewer_modal .st-chat-viewer-modes {
+    display: flex;
     align-items: center;
-    gap: 7px;
-    margin-left: 10px;
-    padding-left: 14px;
-    color: #c9d8f5 !important;
-    font-size: .8rem;
-    white-space: nowrap;
-    border-left: 1px solid var(--viewer-line);
-    cursor: pointer;
+    gap: 8px;
+    flex-wrap: wrap;
+    min-height: 52px;
+    padding: 8px 24px 12px;
+    background: rgba(7, 13, 29, .48) !important;
+    border-bottom: 1px solid var(--viewer-line);
 }
-#st_chat_viewer_modal .st-chat-viewer-html-toggle input { accent-color: var(--viewer-cyan); }
+#st_chat_viewer_modal .st-chat-viewer-modes-label {
+    margin-right: 4px;
+    color: var(--viewer-muted) !important;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+}
 
 #st_chat_viewer_modal .st-chat-viewer-body { display: flex; flex: 1; min-height: 0; }
 #st_chat_viewer_modal .st-chat-viewer-outline {
@@ -214,8 +227,7 @@
 #st_chat_viewer_modal .st-chat-viewer-message-head time { color: var(--viewer-muted) !important; font-size: .74rem; }
 #st_chat_viewer_modal .st-chat-viewer-message-head time { margin-left: auto; }
 #st_chat_viewer_modal .st-chat-viewer-message-content { color: #dbe5f6 !important; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.72; }
-#st_chat_viewer_modal .st-chat-viewer-message-content.is-html { white-space: normal; }
-#st_chat_viewer_modal .st-chat-viewer-message-content.is-html p { margin: .65em 0; }
+#st_chat_viewer_modal .st-chat-viewer-message-content.is-html { white-space: normal; }#st_chat_viewer_modal .st-chat-viewer-message-content.is-html p { margin: .65em 0; }
 #st_chat_viewer_modal .st-chat-viewer-message-content.is-html p:first-child { margin-top: 0; }
 #st_chat_viewer_modal .st-chat-viewer-message-content.is-html p:last-child { margin-bottom: 0; }
 #st_chat_viewer_modal .st-chat-viewer-message-content.is-html a { color: var(--viewer-cyan) !important; text-decoration: underline; }
@@ -223,6 +235,9 @@
 #st_chat_viewer_modal .st-chat-viewer-message-content.is-html pre { overflow: auto; padding: 12px; background: #080d1b !important; border: 1px solid var(--viewer-line); border-radius: 9px; }
 #st_chat_viewer_modal .st-chat-viewer-message-content.is-html code { padding: 2px 5px; color: #d9c8ff; background: rgba(167,139,250,.13) !important; border-radius: 4px; }
 #st_chat_viewer_modal .st-chat-viewer-message-content.is-html blockquote { margin: 10px 0; padding: 8px 14px; color: #aebed8; border-left: 3px solid var(--viewer-purple); background: rgba(167,139,250,.08) !important; }
+#st_chat_viewer_modal .st-chat-viewer-message-content.is-plain { color: #dbe5f6 !important; }
+#st_chat_viewer_modal .st-chat-viewer-message-content.is-helper { padding: 0; overflow: hidden; border-radius: 10px; }
+#st_chat_viewer_modal .st-chat-viewer-helper-frame { display: block; width: 100%; min-height: 60px; border: 0; border-radius: 10px; background: #fff; }
 #st_chat_viewer_modal .st-chat-viewer-empty { padding: 60px 20px; color: var(--viewer-muted) !important; text-align: center; }
 
 @media (max-width: 760px) {
@@ -231,13 +246,14 @@
     #st_chat_viewer_modal .st-chat-viewer-progress-wrap { flex-wrap: wrap; padding: 10px 15px; }
     #st_chat_viewer_modal .st-chat-viewer-range { order: 1; flex-basis: 70%; }
     #st_chat_viewer_modal .st-chat-viewer-percent { order: 1; }
-    #st_chat_viewer_modal .st-chat-viewer-html-toggle { order: 2; width: 100%; margin: 2px 0 0; padding: 7px 0 0; border-top: 1px solid var(--viewer-line); border-left: 0; }
+    #st_chat_viewer_modal .st-chat-viewer-modes { gap: 6px; padding: 6px 15px 10px; }
+    #st_chat_viewer_modal .st-chat-viewer-mode-toggle { flex: 1 1 40%; min-height: 34px; }
     #st_chat_viewer_modal .st-chat-viewer-message { padding: 14px; border-radius: 12px; }
     #st_chat_viewer_modal .st-chat-viewer-message-head { flex-wrap: wrap; gap: 4px 8px; }
     #st_chat_viewer_modal .st-chat-viewer-message-head time { width: 100%; margin-left: 0; }
 }
 
-/* v1.2.0：HTML 模式提示与扩展设置页专用布局 */
+/* v1.3.0：三个显示模式开关（胶囊式） */
 #st_chat_viewer_modal .st-chat-viewer-meta { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
 #st_chat_viewer_modal .st-chat-viewer-mode {
     display: inline-flex; align-items: center; min-height: 20px; padding: 2px 8px;
@@ -245,38 +261,22 @@
     background: rgba(255,255,255,.07) !important; border: 1px solid rgba(180,200,240,.14) !important; border-radius: 999px;
 }
 #st_chat_viewer_modal .st-chat-viewer-mode.is-active { color: #8ff0ce !important; background: rgba(94,231,173,.12) !important; border-color: rgba(94,231,173,.3) !important; }
-#st_chat_viewer_modal .st-chat-viewer-html-toggle {
-    position: relative; display: inline-flex !important; align-items: center; gap: 9px; min-width: 188px; min-height: 38px;
-    margin-left: 8px; padding: 5px 8px 5px 10px; color: #dce8ff !important; background: rgba(100,217,255,.06) !important;
-    border: 1px solid rgba(100,217,255,.2) !important; border-radius: 11px; cursor: pointer; transition: .2s ease;
+#st_chat_viewer_modal .st-chat-viewer-mode-toggle {
+    position: relative; display: inline-flex !important; align-items: center; gap: 8px; min-height: 38px;
+    padding: 4px 10px 4px 8px; color: #dce8ff !important; background: rgba(255,255,255,.04) !important;
+    border: 1px solid rgba(180,200,240,.16) !important; border-radius: 11px; cursor: pointer; transition: .2s ease;
 }
-#st_chat_viewer_modal .st-chat-viewer-html-toggle:hover { background: rgba(100,217,255,.13) !important; border-color: rgba(100,217,255,.42) !important; }
-#st_chat_viewer_modal .st-chat-viewer-toggle-icon { display: grid; width: 26px; height: 26px; place-items: center; color: var(--viewer-cyan) !important; background: rgba(100,217,255,.13) !important; border-radius: 8px; }
+#st_chat_viewer_modal .st-chat-viewer-mode-toggle:hover { background: rgba(124,156,255,.1) !important; border-color: rgba(124,156,255,.42) !important; }
+#st_chat_viewer_modal .st-chat-viewer-mode-toggle:has(input:checked) { background: rgba(94,231,173,.07) !important; border-color: rgba(94,231,173,.4) !important; }
+#st_chat_viewer_modal .st-chat-viewer-toggle-icon { display: grid; width: 24px; height: 24px; place-items: center; font-size: .78rem; background: rgba(255,255,255,.08) !important; border-radius: 7px; }
+#st_chat_viewer_modal .st-chat-viewer-mode-toggle[data-mode="text"] .st-chat-viewer-toggle-icon { color: var(--viewer-green) !important; background: rgba(94,231,173,.12) !important; }
+#st_chat_viewer_modal .st-chat-viewer-mode-toggle[data-mode="html"] .st-chat-viewer-toggle-icon { color: var(--viewer-cyan) !important; background: rgba(100,217,255,.13) !important; }
+#st_chat_viewer_modal .st-chat-viewer-mode-toggle[data-mode="helper"] .st-chat-viewer-toggle-icon { color: var(--viewer-purple) !important; background: rgba(167,139,250,.14) !important; }
 #st_chat_viewer_modal .st-chat-viewer-toggle-copy { display: flex !important; flex: 1 1 auto; flex-direction: column !important; gap: 1px; line-height: 1.1; white-space: nowrap; }
 #st_chat_viewer_modal .st-chat-viewer-toggle-copy b { color: #eef5ff !important; font-size: .76rem; }
 #st_chat_viewer_modal .st-chat-viewer-toggle-copy small { color: #91a4c4 !important; font-size: .62rem; }
-#st_chat_viewer_modal .st-chat-viewer-html-toggle > input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+#st_chat_viewer_modal .st-chat-viewer-mode-toggle > input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 #st_chat_viewer_modal .st-chat-viewer-switch { position: relative; flex: 0 0 34px; width: 34px; height: 20px; background: #2b3852 !important; border: 1px solid rgba(210,225,255,.18); border-radius: 20px; transition: .2s ease; }
 #st_chat_viewer_modal .st-chat-viewer-switch::after { position: absolute; top: 3px; left: 3px; width: 12px; height: 12px; content: ""; background: #9aaaca; border-radius: 50%; transition: .2s ease; }
-#st_chat_viewer_modal .st-chat-viewer-html-toggle > input:checked ~ .st-chat-viewer-switch { background: #258b81 !important; border-color: #5ee7ad; }
-#st_chat_viewer_modal .st-chat-viewer-html-toggle > input:checked ~ .st-chat-viewer-switch::after { left: 17px; background: #effff8; }
-
-/* 扩展设置页：完全限定到本插件，避免酒馆主题的 column/writing-mode 规则污染 */
-#extensions_settings .st_chat_viewer_settings_panel { display: block !important; width: 100% !important; margin: 8px 0 !important; color: #e8efff !important; background: linear-gradient(135deg, rgba(29,43,77,.92), rgba(14,22,42,.96)) !important; border: 1px solid rgba(124,156,255,.24) !important; border-radius: 14px !important; box-shadow: 0 10px 30px rgba(0,0,0,.18) !important; writing-mode: horizontal-tb !important; }
-#extensions_settings .st_chat_viewer_settings_panel * { box-sizing: border-box; writing-mode: horizontal-tb !important; }
-#extensions_settings .st_chat_viewer_settings_header { display: flex !important; flex-direction: row !important; align-items: center !important; gap: 10px !important; min-height: 52px; padding: 12px 14px !important; color: #edf4ff !important; background: transparent !important; border: 0 !important; }
-#extensions_settings .st-chat-viewer-settings-title { display: inline-flex !important; flex: 0 0 auto; align-items: center; gap: 8px; white-space: nowrap !important; }
-#extensions_settings .st-chat-viewer-settings-title i { color: #64d9ff !important; }
-#extensions_settings .st-chat-viewer-settings-title b { color: #f4f7ff !important; font-size: .9rem; }
-#extensions_settings .st-chat-viewer-settings-subtitle { flex: 1 1 auto; min-width: 0; overflow: hidden; color: #8fa4c7 !important; font-size: .72rem; text-overflow: ellipsis; white-space: nowrap !important; }
-#extensions_settings .st_chat_viewer_settings_header .inline-drawer-icon { flex: 0 0 auto; margin-left: auto; color: #91a9d1 !important; }
-#extensions_settings .st_chat_viewer_settings_content { display: flex !important; flex-direction: column !important; gap: 9px !important; padding: 0 14px 14px !important; color: #adbfdd !important; background: rgba(4,9,22,.18) !important; border-top: 1px solid rgba(150,180,235,.12) !important; }
-#extensions_settings .st_chat_viewer_settings_content .st_chat_viewer_settings_button { display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: center !important; width: 100% !important; min-height: 40px; gap: 8px !important; margin-top: 12px; padding: 8px 12px !important; color: #f4f8ff !important; background: linear-gradient(135deg, #4d70d8, #7657c9) !important; border: 0 !important; border-radius: 10px !important; white-space: nowrap !important; writing-mode: horizontal-tb !important; cursor: pointer; }
-#extensions_settings .st_chat_viewer_settings_content .st_chat_viewer_settings_button > i,
-#extensions_settings .st_chat_viewer_settings_content .st_chat_viewer_settings_button > span { display: inline-flex !important; flex: 0 0 auto; white-space: nowrap !important; }
-#extensions_settings .st_chat_viewer_settings_content small { color: #8ea3c5 !important; font-size: .72rem; line-height: 1.5; }
-
-@media (max-width: 760px) {
-    #st_chat_viewer_modal .st-chat-viewer-html-toggle { width: 100%; margin: 4px 0 0; }
-    #extensions_settings .st-chat-viewer-settings-subtitle { display: none !important; }
-}
+#st_chat_viewer_modal .st-chat-viewer-mode-toggle > input:checked ~ .st-chat-viewer-switch { background: #258b81 !important; border-color: #5ee7ad; }
+#st_chat_viewer_modal .st-chat-viewer-mode-toggle > input:checked ~ .st-chat-viewer-switch::after { left: 17px; background: #effff8; }
