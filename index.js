@@ -10,6 +10,7 @@ let range;
 let percentInput;
 let status;
 let htmlToggle;
+let htmlModeLabel;
 let lastChatSignature = '';
 let htmlEnabled = localStorage.getItem(`${EXTENSION_ID}:html-enabled`) === 'true';
 
@@ -88,12 +89,12 @@ function ensureWandButton() {
     const settings = document.getElementById('extensions_settings');
     if (settings && !settings.querySelector(`.${EXTENSION_ID}_settings_button`)) {
         const wrapper = document.createElement('div');
-        wrapper.className = 'inline-drawer';
+        wrapper.className = `inline-drawer ${EXTENSION_ID}_settings_panel`;
         const header = document.createElement('div');
-        header.className = 'inline-drawer-toggle inline-drawer-header';
-        header.innerHTML = '<b>独立聊天记录查看器</b><div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>';
+        header.className = `inline-drawer-toggle inline-drawer-header ${EXTENSION_ID}_settings_header`;
+        header.innerHTML = '<span class="st-chat-viewer-settings-title"><i class="fa-solid fa-book-open"></i><b>独立聊天记录查看器</b></span><span class="st-chat-viewer-settings-subtitle">快速浏览当前对话</span><div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>';
         const content = document.createElement('div');
-        content.className = 'inline-drawer-content';
+        content.className = `inline-drawer-content ${EXTENSION_ID}_settings_content`;
         createButton(content, '打开当前聊天记录', 'fa-book-open', openViewer, `${EXTENSION_ID}_settings_button`);
         const hint = document.createElement('small');
         hint.textContent = '也可以从输入框右侧的魔法棒菜单打开。';
@@ -114,7 +115,7 @@ function buildModal() {
             <header class="st-chat-viewer-header">
                 <div>
                     <h3>独立聊天记录</h3>
-                    <span class="st-chat-viewer-status"></span>
+                    <div class="st-chat-viewer-meta"><span class="st-chat-viewer-status"></span><span class="st-chat-viewer-mode"></span></div>
                 </div>
                 <div class="st-chat-viewer-actions">
                     <button class="menu_button st-chat-viewer-top" title="回到顶部"><i class="fa-solid fa-arrow-up"></i></button>
@@ -127,8 +128,10 @@ function buildModal() {
                 <input class="st-chat-viewer-percent" type="number" min="0" max="100" step="0.1" value="0" aria-label="聊天记录百分比">
                 <span>%</span>
                 <label class="st-chat-viewer-html-toggle" title="开启后在查看器内渲染消息中的安全 HTML">
+                    <span class="st-chat-viewer-toggle-icon"><i class="fa-solid fa-code"></i></span>
+                    <span class="st-chat-viewer-toggle-copy"><b>HTML 渲染</b><small>安全显示网页排版</small></span>
                     <input type="checkbox" aria-label="HTML 渲染" ${htmlEnabled ? 'checked' : ''}>
-                    <span>HTML 渲染</span>
+                    <span class="st-chat-viewer-switch" aria-hidden="true"></span>
                 </label>
             </div>
             <div class="st-chat-viewer-body">
@@ -142,7 +145,9 @@ function buildModal() {
     range = modal.querySelector('.st-chat-viewer-range');
     percentInput = modal.querySelector('.st-chat-viewer-percent');
     status = modal.querySelector('.st-chat-viewer-status');
+    htmlModeLabel = modal.querySelector('.st-chat-viewer-mode');
     htmlToggle = modal.querySelector('.st-chat-viewer-html-toggle input');
+    updateHtmlModeLabel();
 
     modal.querySelector('.st-chat-viewer-backdrop').addEventListener('click', closeViewer);
     modal.querySelector('.st-chat-viewer-close').addEventListener('click', closeViewer);
@@ -155,6 +160,7 @@ function buildModal() {
     htmlToggle.addEventListener('change', () => {
         htmlEnabled = htmlToggle.checked;
         localStorage.setItem(`${EXTENSION_ID}:html-enabled`, String(htmlEnabled));
+        updateHtmlModeLabel();
         renderViewer();
     });
     list.addEventListener('scroll', updateProgressFromScroll, { passive: true });
@@ -220,6 +226,12 @@ function renderViewer() {
         outline.appendChild(item);
     });
     updateProgressFromScroll();
+}
+
+function updateHtmlModeLabel() {
+    if (!htmlModeLabel) return;
+    htmlModeLabel.textContent = htmlEnabled ? 'HTML 已开启' : '纯文本模式';
+    htmlModeLabel.classList.toggle('is-active', htmlEnabled);
 }
 
 function scrollToPercent(value) {
