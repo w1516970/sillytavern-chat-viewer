@@ -26,6 +26,19 @@
 
 安装并启用后，点击输入框右侧魔法棒，选择“独立查看聊天记录”。
 
+## 国内加速访问
+
+如果访问 GitHub 较慢，可以通过以下国内加速方式获取本插件（内容与 GitHub 仓库实时同步）：
+
+- **jsDelivr CDN（浏览/下载单个文件）**：
+  - <https://cdn.jsdelivr.net/gh/w1516970/sillytavern-chat-viewer@main/manifest.json>
+  - <https://cdn.jsdelivr.net/gh/w1516970/sillytavern-chat-viewer@main/index.js>
+  - <https://cdn.jsdelivr.net/gh/w1516970/sillytavern-chat-viewer@main/style.css>
+- **GitHub 加速代理（克隆 / 扩展管理器安装用）**：
+  - `https://ghproxy.net/https://github.com/w1516970/sillytavern-chat-viewer`
+  - `https://gh-proxy.com/https://github.com/w1516970/sillytavern-chat-viewer`
+  - 在 SillyTavern 扩展管理中"通过 Git URL 安装"时，填入上面带代理前缀的地址即可。
+
 ## 兼容说明
 
 插件使用 SillyTavern 官方扩展清单格式和 `SillyTavern.getContext().chat` API。它不会修改、删除或保存聊天内容，也不会参与提示词生成。HTML 模式会通过 SillyTavern 提供的 DOMPurify 清理脚本、iframe、表单和事件属性；不会执行聊天记录中的 JavaScript。
